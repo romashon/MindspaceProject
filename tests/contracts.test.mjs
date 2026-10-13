@@ -107,3 +107,39 @@ test("GET returns mock contracts and calculated fields without leaking credentia
 
   assert.doesNotMatch(JSON.stringify(body), /private-|user:/);
 });
+
+const summaries = loadTypeScript("src/features/contracts/summary.ts");
+
+test("summary includes day 30, excludes overdue renewals, and sums Critical and Warning revenue", () => {
+  const contracts = [-1, 0, 29, 30, 90, 91].map((daysRemaining, index) => ({
+    ...data.mockContracts[0],
+    id: `summary-${index}`,
+    daysRemaining,
+    riskLevel: daysRemaining < 30 ? "Critical" : daysRemaining <= 90 ? "Warning" : "Healthy",
+    monthlyRevenue: (index + 1) * 100,
+  }));
+  const result = summaries.getContractsSummary(contracts);
+
+  assert.equal(result.totalContracts, 6);
+  assert.equal(result.expiringSoon, 3);
+  assert.equal(result.monthlyRevenueAtRisk, 1500);
+});
+
+test("summary returns zeroes for an empty portfolio", () => {
+  const result = summaries.getContractsSummary([]);
+  assert.equal(result.totalContracts, 0);
+  assert.equal(result.expiringSoon, 0);
+  assert.equal(result.monthlyRevenueAtRisk, 0);
+});
+
+test("mock portfolio summary matches the October 13, 2026 renewal snapshot", () => {
+  const contracts = data.mockContracts.map((contract) => ({
+    ...contract,
+    ...calculations.calculateContractDerivedFields(contract.contractEndDate, new Date("2026-10-13T12:00:00Z")),
+  }));
+  const result = summaries.getContractsSummary(contracts);
+
+  assert.equal(result.totalContracts, 12);
+  assert.equal(result.expiringSoon, 3);
+  assert.equal(result.monthlyRevenueAtRisk, 100660);
+});

@@ -15,9 +15,9 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Overview (`/`), Projects (`/projects`), and Activity
-(`/activity`) use clearly labeled sample data. Search and status filtering run
-locally in the browser.
+Open http://localhost:3000. Overview (`/`) loads contract data from
+`/api/contracts`. Projects (`/projects`) and Activity (`/activity`) retain the
+starter sample data. Search and filtering run locally in the browser.
 
 ## Project Structure
 
@@ -38,6 +38,9 @@ src/
 		mockContracts.ts      # Fictional Salesforce-style workspace contracts
 		renewals.ts           # Empty renewal data placeholder
 	features/
+		contracts/
+			components/         # API-driven dashboard and contracts table
+			summary.ts          # Portfolio summary calculations
 		dashboard/
 			components/         # Dashboard-specific UI
 			data.ts             # Typed mock data; replace with a data layer
@@ -52,15 +55,18 @@ src/
 public/                   # Static assets
 ```
 
-Routes and data-driven pages are Server Components by default. Only navigation
-and project filtering use Client Components. The `@/*` alias resolves to `src/*`.
+Route entry points are Server Components. The contracts dashboard uses a Client
+Component to fetch the same-origin API, manage loading/error states, and filter
+the table. Navigation and project filtering also use Client Components.
+The `@/*` alias resolves to `src/*`.
 The route group `(dashboard)` does not appear in URLs. Add feature folders when
 new domains are introduced; keep shared UI in `components/` and utilities in `lib/`.
 
 ## Renewal Tracker Placeholders
 
 The requested `app/`, `components/`, `lib/`, `data/`, and `types/` folders are
-present. Existing dashboard routes and sample projects remain unchanged.
+present. The legacy renewal placeholders remain available but are not used by
+the contracts dashboard. Sample Projects and Activity pages remain unchanged.
 
 - `types/renewal.ts` provides a provisional `WorkspaceRenewal` model with `id`,
 	`workspaceName`, and `renewalDate` (an ISO 8601 date string). Adjust it to the
@@ -102,7 +108,35 @@ are returned. Do not put credentials in the instance URL.
 
 The endpoint is dynamic and sends `Cache-Control: no-store` so renewal
 calculations are not frozen at build time or served from a stale cache. It does
-not call Salesforce and is not yet connected to the dashboard UI.
+not call Salesforce. The overview dashboard fetches this endpoint on mount and
+when refreshed, without importing mock records into its client bundle.
+
+## Renewal Dashboard
+
+The overview shows three portfolio-wide summary cards above a contracts table:
+
+- **Total contracts:** all records returned by the API.
+- **Expiring within 30 days:** contracts with 0 through 30 days remaining,
+	inclusive. Already-expired contracts are excluded from this count.
+- **Monthly revenue at risk:** monthly revenue summed across Critical and
+	Warning contracts, including overdue contracts. This is a renewal exposure
+	indicator, not a forecast of lost revenue.
+
+Mock monthly revenue is assumed to be normalized to EUR across all locations.
+The dashboard formats these values as EUR; production integration must provide
+a consistent currency or add a currency model before combining values.
+
+The table is sorted by expiration date and shows account, location, desk count,
+monthly revenue, contract end date, days remaining, and risk. Critical badges
+are red, Warning badges orange, and Healthy badges green, with text labels.
+Search, location filtering, and risk filtering affect only the table; summary
+cards always represent the full portfolio. Loading, failure/retry, and empty
+states are supported. On narrow screens the cards stack and the table scrolls
+horizontally inside its container.
+
+At the October 13, 2026 snapshot, the mock portfolio has 12 contracts, 3 expiring
+within 30 days, and EUR 100,660 in monthly revenue at risk. Counts and exposure
+change over time as the API recalculates remaining days.
 
 ## Checks
 
