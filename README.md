@@ -1,8 +1,9 @@
 # MindspaceProject
 
-A small internal dashboard starter built with Next.js 15, React 19, TypeScript,
-App Router, and ESLint. Uses npm, a `src/` directory, self-hosted fonts, and
-Lucide icons. No authentication or backend integration is included.
+A Workspace Renewal Tracker dashboard starter built with Next.js 15, React 19,
+TypeScript, App Router, and ESLint. Uses npm, a `src/` directory, self-hosted
+fonts, and Lucide icons. Contract renewal information will come from a
+server-side API. No authentication or backend integration is implemented yet.
 
 ## Local Development
 
@@ -31,6 +32,8 @@ src/
 		layout.tsx            # Root document, fonts, and metadata
 	components/
 		layout/               # Shared application shell and navigation
+	data/
+		renewals.ts           # Empty renewal data placeholder
 	features/
 		dashboard/
 			components/         # Dashboard-specific UI
@@ -38,6 +41,9 @@ src/
 			types.ts            # Feature contracts
 	lib/
 		format.ts             # Shared date formatting
+		renewal-api.ts        # Future server-side data loader contract
+	types/
+		renewal.ts            # Provisional workspace renewal model
 public/                   # Static assets
 ```
 
@@ -45,6 +51,24 @@ Routes and data-driven pages are Server Components by default. Only navigation
 and project filtering use Client Components. The `@/*` alias resolves to `src/*`.
 The route group `(dashboard)` does not appear in URLs. Add feature folders when
 new domains are introduced; keep shared UI in `components/` and utilities in `lib/`.
+
+## Renewal Tracker Placeholders
+
+The requested `app/`, `components/`, `lib/`, `data/`, and `types/` folders are
+present. Existing dashboard routes and sample projects remain unchanged.
+
+- `types/renewal.ts` provides a provisional `WorkspaceRenewal` model with `id`,
+	`workspaceName`, and `renewalDate` (an ISO 8601 date string). Adjust it to the
+	actual API contract before integration.
+- `data/renewals.ts` exports an empty, typed `renewalPlaceholders` array. It is
+	not live API data and is not connected to the current UI.
+- `lib/renewal-api.ts` defines the `RenewalLoader` function type only. No
+	endpoint, fetch implementation, or credentials are configured.
+
+Implement the loader on the server and call it from a Server Component or Route
+Handler. Add a `server-only` guard and validate API responses at that boundary
+when implementing the integration. Keep credentials in server environment
+variables, never in `data/` or client components.
 
 ## Checks
 
