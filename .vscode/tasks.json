@@ -1,0 +1,82 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build dashboard",
+			"type": "shell",
+			"command": "npm",
+			"windows": {
+				"command": "npm.cmd"
+			},
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Audit dependencies",
+			"type": "shell",
+			"command": "npm",
+			"windows": {
+				"command": "npm.cmd"
+			},
+			"args": [
+				"audit"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Lint dashboard",
+			"type": "shell",
+			"command": "npm",
+			"windows": {
+				"command": "npm.cmd"
+			},
+			"args": [
+				"run",
+				"lint"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Typecheck dashboard",
+			"type": "shell",
+			"command": "npm",
+			"windows": {
+				"command": "npm.cmd"
+			},
+			"args": [
+				"run",
+				"typecheck"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Audit production dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"audit",
+				"--omit=dev"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
