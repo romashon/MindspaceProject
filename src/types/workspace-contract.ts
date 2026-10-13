@@ -1,4 +1,4 @@
-export type RiskLevel = "low" | "medium" | "high";
+export type RiskLevel = "Critical" | "Warning" | "Healthy";
 
 export interface WorkspaceContract {
   id: string;
@@ -16,3 +16,8 @@ export interface WorkspaceContractDerivedFields {
 
 export interface WorkspaceContractWithDerivedFields
   extends WorkspaceContract, WorkspaceContractDerivedFields {}
+
+export interface ContractsApiResponse {
+  instanceUrl: string | null;
+  contracts: WorkspaceContractWithDerivedFields[];
+}
