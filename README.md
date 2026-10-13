@@ -1,8 +1,8 @@
 # MindspaceProject
 
 A Workspace Renewal Tracker dashboard starter built with Next.js 15, React 19,
-TypeScript, App Router, and ESLint. Uses npm, a `src/` directory, self-hosted
-fonts, and Lucide icons. Contract renewal information will come from a
+TypeScript, App Router, and ESLint. Uses npm, a `src/` directory, Tailwind CSS,
+self-hosted fonts, and Lucide icons. Contract renewal information will come from a
 server-side API. `GET /api/contracts` currently returns mock contracts. No
 authentication or live Salesforce integration is implemented yet.
 
@@ -137,6 +137,21 @@ horizontally inside its container.
 At the October 13, 2026 snapshot, the mock portfolio has 12 contracts, 3 expiring
 within 30 days, and EUR 100,660 in monthly revenue at risk. Counts and exposure
 change over time as the API recalculates remaining days.
+
+## Styling
+
+The shared shell and contracts dashboard use Tailwind CSS 3 utility classes,
+without an external UI component library. The existing Lucide icons and local
+DM Sans font are retained. `tailwind.config.ts` scans `src/` and defines neutral
+surfaces, teal brand accents, typography, and subtle metric-card shadows.
+`postcss.config.mjs` runs Tailwind and Autoprefixer during Next.js builds.
+
+`src/app/globals.css` keeps shared base styles and legacy Projects/Activity
+styles in Tailwind layers so utilities take precedence. Use complete utility
+class strings for conditional states rather than building color names at runtime.
+The shell uses desktop side navigation from 1024px and top navigation below it;
+metric cards stack below 768px. Loading motion respects reduced-motion settings.
+Restart the development server after changing PostCSS configuration.
 
 ## Checks
 
