@@ -31,7 +31,7 @@ Mindspace's branding and workflows.
 Settings are server-side; use [.env.example](.env.example) as a template:
 
 ```dotenv
-CONTRACTS_DATA_SOURCE=mock # mock or salesforce
+CONTRACTS_DATA_SOURCE=salesforce # mock or salesforce
 SALESFORCE_INSTANCE_URL=https://your-org.my.salesforce.com
 SALESFORCE_CLIENT_ID=
 SALESFORCE_CLIENT_SECRET=
@@ -47,7 +47,7 @@ and EUR amounts. Enable multi-currency if the org uses it; only EUR is supported
 
 GitHub -> Vercel, using Next.js and Node.js 22.x. Install with `npm ci`; build
 with `npm run build`. Set environment variables in Vercel, including
-`SALESFORCE_INSTANCE_URL` in mock mode.
+`SALESFORCE_INSTANCE_URL` in salesforce or mock mode.
 ## Connecting to a Real Salesforce Org
 
 The connection already works. For another org, I would verify field mappings,
