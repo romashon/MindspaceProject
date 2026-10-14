@@ -47,8 +47,7 @@ and EUR amounts. Enable multi-currency if the org uses it; only EUR is supported
 
 GitHub -> Vercel, using Next.js and Node.js 22.x. Install with `npm ci`; build
 with `npm run build`. Set environment variables in Vercel, including
-`SALESFORCE_INSTANCE_URL` in mock mode. See [deployment steps](docs/Vercel-Deployment.md).
-
+`SALESFORCE_INSTANCE_URL` in mock mode.
 ## Connecting to a Real Salesforce Org
 
 The connection already works. For another org, I would verify field mappings,
