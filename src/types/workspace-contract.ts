@@ -19,5 +19,6 @@ export interface WorkspaceContractWithDerivedFields
 
 export interface ContractsApiResponse {
   instanceUrl: string | null;
+  dataSource: "mock" | "salesforce";
   contracts: WorkspaceContractWithDerivedFields[];
 }

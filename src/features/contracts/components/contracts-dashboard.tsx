@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, CalendarClock, CircleDollarSign, FileText, RefreshCw } from "lucide-react";
 import { formatRevenue } from "@/lib/format";
+import { salesforceErrorMessages } from "@/lib/salesforce-errors";
 import type { ContractsApiResponse } from "@/types/workspace-contract";
 import { getContractsSummary } from "../summary";
 import { ContractsTable } from "./contracts-table";
@@ -10,7 +11,12 @@ import { ContractsTable } from "./contracts-table";
 type ContractsState =
   | { status: "loading" }
   | { status: "success"; data: ContractsApiResponse }
-  | { status: "error" };
+  | { status: "error"; message: string };
+
+const loadErrors: Record<string, string> = {
+  ...salesforceErrorMessages,
+  INVALID_DATA_SOURCE: "Invalid contracts data source. Use mock or salesforce.",
+};
 
 export function ContractsDashboard() {
   const [state, setState] = useState<ContractsState>({ status: "loading" });
@@ -20,6 +26,7 @@ export function ContractsDashboard() {
     const controller = new AbortController();
 
     async function loadContracts() {
+      let failureMessage = "Could not load contracts.";
       try {
         const response = await fetch("/api/contracts", {
           cache: "no-store",
@@ -27,12 +34,16 @@ export function ContractsDashboard() {
         });
 
         if (!response.ok) {
+          const body = await response.json();
+          if (body && typeof body.error === "string" && Object.hasOwn(loadErrors, body.error)) {
+            failureMessage = loadErrors[body.error];
+          }
           throw new Error("Contracts request failed.");
         }
 
         const data: ContractsApiResponse = await response.json();
 
-        if (!data || !Array.isArray(data.contracts)) {
+        if (!data || !Array.isArray(data.contracts) || !["mock", "salesforce"].includes(data.dataSource)) {
           throw new Error("Invalid contracts response.");
         }
 
@@ -41,7 +52,7 @@ export function ContractsDashboard() {
         }
       } catch {
         if (!controller.signal.aborted) {
-          setState({ status: "error" });
+          setState({ status: "error", message: failureMessage });
         }
       }
     }
@@ -86,7 +97,7 @@ export function ContractsDashboard() {
       <section aria-labelledby="contracts-heading">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5"><h2 id="contracts-heading" className="text-base font-semibold text-ink">Contracts</h2>{summary && <span className="grid min-w-6 place-items-center rounded border border-line bg-white px-1.5 py-0.5 text-[10px] font-semibold text-muted">{summary.totalContracts}</span>}</div>
-          <span className="flex items-center gap-1.5 text-[11px] text-muted"><span className="size-1.5 rounded-full bg-gray-400" aria-hidden="true" />Sample data</span>
+          {state.status === "success" && <span className="flex items-center gap-1.5 text-[11px] text-muted"><span className={`size-1.5 rounded-full ${state.data.dataSource === "salesforce" ? "bg-emerald-500" : "bg-gray-400"}`} aria-hidden="true" />{state.data.dataSource === "salesforce" ? "Salesforce" : "Sample data"}</span>}
         </div>
         {state.status === "loading" && (
           <div className="min-h-[360px] border-y border-line bg-white" role="status">
@@ -97,7 +108,7 @@ export function ContractsDashboard() {
         {state.status === "error" && (
           <div className="flex flex-wrap items-center gap-3 border-y border-red-100 bg-red-50/50 p-5 text-red-800" role="alert">
             <AlertCircle size={19} aria-hidden="true" />
-            <p className="min-w-0 flex-1 text-sm">Could not load contracts.</p>
+            <p className="min-w-0 flex-1 text-sm">{state.message}</p>
             <button type="button" className="inline-flex min-h-9 items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-xs font-medium text-ink hover:bg-gray-50" onClick={reloadContracts}><RefreshCw size={15} aria-hidden="true" />Retry</button>
           </div>
         )}
